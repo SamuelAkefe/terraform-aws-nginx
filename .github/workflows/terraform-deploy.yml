@@ -5,7 +5,7 @@ on:
         branches:
             - main
     pull_request:
-        
+
 permissions:
     contents: read
 
@@ -15,7 +15,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_aCCESS_KEY }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_REGION: ${{ vars.AWS_REGION }}
 
         steps:
@@ -26,6 +26,8 @@ jobs:
             # 2. Install Terraform
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
+              with:
+                terraform_version: "1.9.0" # Pin to a stable version
 
             # 3. Check formatting (Best Practice)
             - name: Terraform Format
