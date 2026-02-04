@@ -208,6 +208,17 @@ resource "aws_instance" "public_server" {
   vpc_security_group_ids      = [aws_security_group.public_sg.id]
   associate_public_ip_address = true
 
+  # Encrypt the hard drive (AVD-AWS-0131)
+  root_block_device {
+    encrypted = true
+  }
+
+  # Force IMDSv2 (Token required) (AVD-AWS-0028)
+  # This prevents SSRF attacks
+  metadata_options {
+    http_tokens = "required"
+  }
+
   # Attach the key pair we created in Step 1
   key_name = aws_key_pair.generated_key.key_name
 
