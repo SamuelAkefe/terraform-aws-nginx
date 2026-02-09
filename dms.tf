@@ -1,3 +1,38 @@
+# IAM ROLES FOR DMS (Required for first-time setup)
+
+# DMS VPC ROLE (Network Access)
+data "aws_iam_policy_document" "dms_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["dms.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "dms-vpc-role" {
+  name               = "dms-vpc-role"
+  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms-vpc-role-attachment" {
+  role       = aws_iam_role.dms-vpc-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+}
+
+# 2. DMS CloudWatch Role (Logging)
+resource "aws_iam_role" "dms-cloudwatch-logs-role" {
+  name               = "dms-cloudwatch-logs-role"
+  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-attachment" {
+  role       = aws_iam_role.dms-cloudwatch-logs-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
+}
+
 # Security Group for DMS
 resource "aws_security_group" "dms_sg" {
   name        = "dms-replication-sg"
@@ -28,6 +63,11 @@ resource "aws_dms_replication_subnet_group" "dms_subnet_group" {
   tags = {
     Name = "dms-subnet-group"
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.dms-vpc-role-attachment,
+    aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-attachment
+  ]
 }
 # 3. Replication Instance (The "Worker")
 resource "aws_dms_replication_instance" "dms_instance" {
