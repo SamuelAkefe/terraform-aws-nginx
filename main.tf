@@ -316,3 +316,24 @@ EOF
   }
 }
 
+# Allow DMS TO ACCESS EC2 (Source)
+resource "aws_security_group_rule" "allow_dms_to_ec2" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.dms_sg.id # Allow DMS sg
+
+  security_group_id = aws_security_group.public_sg.id # Add rule to EC2 SG 
+}
+
+# ALLOW DMS TO ACCESS RDS (Target)
+resource "aws_security_group_rule" "allow_dms_to_rds" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.dms_sg.id # Allow DMS SG
+
+  security_group_id = aws_security_group.rds_sg.id # Add rule to RDS SG
+}
