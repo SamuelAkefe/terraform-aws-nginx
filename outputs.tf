@@ -23,3 +23,8 @@ output "ec2_public_ip" {
   description = "The public IP of the Nginx server"
   value       = aws_instance.public_server.public_ip
 }
+
+output "rds_endpoint" {
+  description = "The connection endpoint for the database"
+  value       = aws_db_instance.postgres.address
+} 

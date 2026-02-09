@@ -28,3 +28,22 @@ variable "project_name" {
   default     = "my-vpc"
 }
 
+variable "private_subnet_2_cidr" {
+  description = "CIDR block for the second private subnet"
+  type        = string
+  default     = "10.0.3.0/24"
+}
+
+# Database Credentials
+variable "db_username" {
+  description = "Database master username"
+  type        = string
+  default     = "flask_user"
+}
+
+variable "db_password" {
+  description = "Database master password"
+  type        = string
+  sensitive   = true
+  default     = "admin"
+}

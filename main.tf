@@ -60,6 +60,80 @@ resource "aws_subnet" "private" {
   }
 }
 
+# Create another Private Subnet.
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_subnet_2_cidr
+  availability_zone = data.aws_availability_zones.available.names[1]
+
+  tags = {
+    Name = "${var.project_name}-private-subnet-2"
+  }
+}
+
+resource "aws_db_subnet_group" "rds_group" {
+  name = "${var.project_name}-rds-group"
+  subnet_ids = [
+    aws_subnet.private.id,
+    aws_subnet.private_subnet_2.id
+  ]
+
+  tags = {
+    Name = "${var.project_name}-rds-group"
+  }
+}
+
+#3. Create RDS SECURITY GROUP
+resource "aws_security_group" "rds_sg" {
+  name        = "${var.project_name}-rds-sg"
+  description = "Allow inbound traffic from Web App"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "Postgres from Web Server"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    # Allow traffic ONLY from your Web Server's Security group
+    security_groups = [aws_security_group.public_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-rds-dg"
+  }
+}
+
+#4. Create the RDS instance_type
+resource "aws_db_instance" "postgres" {
+  identifier        = "${var.project_name}-db"
+  allocated_storage = 20
+  storage_type      = "gp2"
+  engine            = "postgres"
+  engine_version    = "14"
+  instance_class    = "db.t3.micro"
+  db_name           = "flask_db"
+  username          = var.db_username
+  password          = var.db_password
+
+  # Network & Security
+  db_subnet_group_name   = aws_db_subnet_group.rds_group.name
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  publicly_accessible    = false
+  skip_final_snapshot    = true # Good for dev/learning, dangerous for prod!
+
+  tags = {
+    Name = "${var.project_name}-db"
+  }
+}
+
+
 # Create Internet Gateway 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
@@ -129,6 +203,12 @@ resource "aws_route_table_association" "public" {
 # Associate Private Subnet with Route Table
 resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private.id
+  route_table_id = aws_route_table.private.id
+}
+
+# Associate Private Subnet2 with Route Table
+resource "aws_route_table_association" "private_2" {
+  subnet_id      = aws_subnet.private_subnet_2.id
   route_table_id = aws_route_table.private.id
 }
 
@@ -235,3 +315,4 @@ EOF
     Name = "${var.project_name}-ec2"
   }
 }
+
