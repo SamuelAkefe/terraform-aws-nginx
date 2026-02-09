@@ -72,7 +72,7 @@ resource "aws_dms_replication_subnet_group" "dms_subnet_group" {
 # 3. Replication Instance (The "Worker")
 resource "aws_dms_replication_instance" "dms_instance" {
   replication_instance_id    = "my-dms-instance"
-  replication_instance_class = "dms.t2.micro" # Free Tier eligible
+  replication_instance_class = "dms.t3.small" # Free Tier eligible
   allocated_storage          = 20
 
   vpc_security_group_ids      = [aws_security_group.dms_sg.id]
