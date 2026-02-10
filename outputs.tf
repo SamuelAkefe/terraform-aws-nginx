@@ -27,4 +27,8 @@ output "ec2_public_ip" {
 output "rds_endpoint" {
   description = "The connection endpoint for the database"
   value       = aws_db_instance.postgres.address
-} 
+}
+
+output "s3_bucket_name" {
+  value = aws_s3_bucket.uploads.id
+}

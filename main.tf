@@ -302,6 +302,9 @@ resource "aws_instance" "public_server" {
   # Attach the key pair we created in Step 1
   key_name = aws_key_pair.generated_key.key_name
 
+  # IAM_instance_profile 
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
   # Install Nginx on startup
   user_data = <<-EOF
 #!/bin/bash
