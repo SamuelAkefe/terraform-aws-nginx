@@ -12,6 +12,19 @@ resource "aws_s3_bucket" "uploads" {
   }
 }
 
+# Enable Encryption
+resource "aws_s3_bucket_server_side_encryption_configuration" "uploads_encryption" {
+  bucket = aws_s3_bucket.uploads.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+
+
 # Block public access (Security Best Practice)
 # We will access files via the App (boto3) or CloudFront, not direct public URLs for now.
 resource "aws_s3_bucket_public_access_block" "uploads_access" {

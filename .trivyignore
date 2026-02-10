@@ -1,0 +1,17 @@
+# .trivyignore
+
+# --- NETWORKING RISKS ---
+# Accept Risk: SSH/HTTP Open to world for learning (No VPN)
+AVD-AWS-0107
+# Accept Risk: Egress Open to world to allow updates/installs
+AVD-AWS-0104
+# Accept Risk: Public IP on subnet required for internet access
+AVD-AWS-0164
+
+# --- ENCRYPTION RISKS ---
+# Accept Risk: Unencrypted RDS for learning project
+AVD-AWS-0080
+# Accept Risk: Unencrypted S3 Bucket for learning project
+AVD-AWS-0088
+# Accept Risk: Not using Customer Managed KMS Keys (Standard AWS keys are fine)
+AVD-AWS-0132

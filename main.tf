@@ -122,6 +122,9 @@ resource "aws_db_instance" "postgres" {
   username          = var.db_username
   password          = var.db_password
 
+  # SECURITY FIX
+  storage_encrypted = true
+
   # Network & Security
   db_subnet_group_name   = aws_db_subnet_group.rds_group.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
